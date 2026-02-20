@@ -3,9 +3,10 @@ package com.sky.controller.admin;
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
-import com.sky.entity.PageBean;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,15 +73,12 @@ public class EmployeeController {
 
 
     @GetMapping("/page")
-    public Result<PageBean<Employee>> list(
-            @RequestParam(required = false) String name,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int pageSize
-    ) {
-        if (page < 1 || pageSize < 1) {
+    public Result<PageResult> list(EmployeePageQueryDTO employeePageQueryDTO) {
+        if (employeePageQueryDTO.getPage() < 1 || employeePageQueryDTO.getPage() < 1) {
             return Result.error("page/pageSize must be >= 1");
         }
-        return Result.success(employeeService.list(name, page, pageSize));
+        PageResult pageResult = employeeService.list(employeePageQueryDTO);
+        return Result.success(pageResult);
     }
 
     @PostMapping

@@ -2,11 +2,9 @@ package com.sky.service;
 
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
-import com.sky.entity.PageBean;
-import com.sky.vo.EmployeeLoginVO;
-
-import java.util.List;
+import com.sky.result.PageResult;
 
 public interface EmployeeService {
 
@@ -17,7 +15,7 @@ public interface EmployeeService {
      */
     Employee login(EmployeeLoginDTO employeeLoginDTO);
 
-    PageBean<Employee> list(String name, int page, int pageSize);
+    PageResult list(EmployeePageQueryDTO employeePageQueryDTO);
 
     void addEmployee(EmployeeDTO employeeDTO);
 }
