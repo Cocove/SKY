@@ -27,7 +27,15 @@
             #{item}
         </foreach>
     </select>
+
     <select id="getBySetmealId" resultType="com.sky.entity.SetmealDish">
         select * from setmeal_dish where setmeal_id = #{setmealId}
     </select>
+    <select id="getDishesBySetmealId" resultType="com.sky.vo.DishItemVO">
+        select sd.name, sd.copies, d.image, d.description
+        from setmeal_dish sd
+        left join dish d on sd.dish_id = d.id
+        where sd.setmeal_id = #{id}
+    </select>
+
 </mapper>

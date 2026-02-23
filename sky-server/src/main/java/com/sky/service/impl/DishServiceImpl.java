@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class DishServiceImpl implements DishService {
@@ -175,10 +178,37 @@ public class DishServiceImpl implements DishService {
     @Override
     public List<Dish> list(Long categoryId) {
 
-
-
         List<Dish> setmealIds = dishMapper.getByCategoryId(categoryId);
 
         return setmealIds;
     }
+
+    @Override
+    public List<DishVO> listWithFlavor(Long categoryId) {
+        List<Dish> dishes = dishMapper.getByCategoryId(categoryId);
+        if (dishes == null || dishes.isEmpty()) return new ArrayList<>();
+
+        List<Long> dishIds = dishes.stream().map(Dish::getId).collect(Collectors.toList());
+
+        List<DishFlavor> flavors = dishFlavorMapper.listByDishIds(dishIds);
+
+        Map<Long, List<DishFlavor>> flavorMap = flavors.stream()
+                .collect(java.util.stream.Collectors.groupingBy(DishFlavor::getDishId));
+
+        List<DishVO> dishVOList = new ArrayList<>(dishes.size());
+        for (Dish dish : dishes) {
+            DishVO vo = new DishVO();
+            // BeanUtils 可以用，但性能一般；手写/MapStruct 更快更清晰（看你项目）
+            org.springframework.beans.BeanUtils.copyProperties(dish, vo);
+            vo.setFlavors(flavorMap.getOrDefault(dish.getId(), Collections.emptyList()));
+            if(dish.getStatus() == StatusConstant.DISABLE){
+                break;
+            }else if(dish.getStatus() == StatusConstant.ENABLE){
+                dishVOList.add(vo);
+            }
+
+        }
+        return dishVOList;
+    }
+
 }
