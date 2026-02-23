@@ -46,6 +46,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 新增菜品和对应的口味
+     *
      * @param dishDTO
      */
     @Override
@@ -56,13 +57,13 @@ public class DishServiceImpl implements DishService {
 
         //获取菜品id
 
-        
+
         dishMapper.insert(dish);
         Long dishId = dish.getId();
 
         List<DishFlavor> flavors = dishDTO.getFlavors();
 
-        if(flavors != null && flavors.size() > 0){
+        if (flavors != null && flavors.size() > 0) {
             for (DishFlavor flavor : flavors) {
                 flavor.setDishId(dishId);
             }
@@ -97,9 +98,9 @@ public class DishServiceImpl implements DishService {
     public void delete(List<Long> ids) {
 
         //判断菜品是否能够删除 --- 启售中不能删除
-        for(Long id : ids){
+        for (Long id : ids) {
             Dish dish = dishMapper.getById(id);
-            if(dish.getStatus() == StatusConstant.ENABLE){
+            if (dish.getStatus() == StatusConstant.ENABLE) {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
             }
         }
@@ -108,7 +109,7 @@ public class DishServiceImpl implements DishService {
 
         List<Long> setmealIdsByDishId = setmealDishMapper.getSetmealIdsByDishIds(ids);
 
-        if(setmealIdsByDishId != null && setmealIdsByDishId.size() > 0){
+        if (setmealIdsByDishId != null && setmealIdsByDishId.size() > 0) {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
 
@@ -142,7 +143,7 @@ public class DishServiceImpl implements DishService {
         dishFlavorMapper.deleteByDishId(dishDTO.getId());
 
         List<DishFlavor> flavors = dishDTO.getFlavors();
-        if(flavors != null && flavors.size() > 0){
+        if (flavors != null && flavors.size() > 0) {
             for (DishFlavor flavor : flavors) {
                 flavor.setDishId(dishId);
             }
@@ -159,11 +160,11 @@ public class DishServiceImpl implements DishService {
                 .build();
         dishMapper.update(dish);
 
-        if(status == StatusConstant.DISABLE){
+        if (status == StatusConstant.DISABLE) {
             List<Long> dishIds = new ArrayList<>();
             dishIds.add(id);
             List<Long> setmealIds = setmealDishMapper.getSetmealIdsByDishIds(dishIds);
-            if(setmealIds != null && setmealIds.size() > 0){
+            if (setmealIds != null && setmealIds.size() > 0) {
                 for (Long setmealId : setmealIds) {
                     Setmeal setmeal = Setmeal.builder()
                             .id(setmealId)
@@ -177,15 +178,18 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public List<Dish> list(Long categoryId) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .build();
 
-        List<Dish> setmealIds = dishMapper.getByCategoryId(categoryId);
+        List<Dish> setmealIds = dishMapper.getByCategoryId(dish);
 
         return setmealIds;
     }
 
     @Override
-    public List<DishVO> listWithFlavor(Long categoryId) {
-        List<Dish> dishes = dishMapper.getByCategoryId(categoryId);
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishes = dishMapper.getByCategoryId(dish);
         if (dishes == null || dishes.isEmpty()) return new ArrayList<>();
 
         List<Long> dishIds = dishes.stream().map(Dish::getId).collect(Collectors.toList());
@@ -196,16 +200,14 @@ public class DishServiceImpl implements DishService {
                 .collect(java.util.stream.Collectors.groupingBy(DishFlavor::getDishId));
 
         List<DishVO> dishVOList = new ArrayList<>(dishes.size());
-        for (Dish dish : dishes) {
+        for (Dish dish1 : dishes) {
             DishVO vo = new DishVO();
             // BeanUtils 可以用，但性能一般；手写/MapStruct 更快更清晰（看你项目）
-            org.springframework.beans.BeanUtils.copyProperties(dish, vo);
-            vo.setFlavors(flavorMap.getOrDefault(dish.getId(), Collections.emptyList()));
-            if(dish.getStatus() == StatusConstant.DISABLE){
-                break;
-            }else if(dish.getStatus() == StatusConstant.ENABLE){
-                dishVOList.add(vo);
-            }
+            org.springframework.beans.BeanUtils.copyProperties(dish1, vo);
+            vo.setFlavors(flavorMap.getOrDefault(dish1.getId(), Collections.emptyList()));
+
+            dishVOList.add(vo);
+
 
         }
         return dishVOList;

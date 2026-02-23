@@ -10,6 +10,7 @@ import java.util.List;
 public interface SetmealDishMapper {
     List<Long> getSetmealIdsByDishIds(List<Long> ids);
 
+
     void insertBatch(List<SetmealDish> setmealDishes);
 
     void deleteBySetmealIds(List<Long> ids);
