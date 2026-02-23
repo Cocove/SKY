@@ -13,6 +13,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * jwt令牌校验的拦截器
@@ -36,6 +38,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         System.out.println("当前线程ID： " + Thread.currentThread().getId());
+
 
 
         //判断当前拦截到的是Controller的方法还是其他资源

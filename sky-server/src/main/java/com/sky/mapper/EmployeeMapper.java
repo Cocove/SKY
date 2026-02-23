@@ -1,6 +1,8 @@
 package com.sky.mapper;
 
+import com.sky.annotation.AutoFill;
 import com.sky.entity.Employee;
+import com.sky.enumeration.OperationType;
 import com.sky.vo.EmployeeLoginVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -20,7 +22,11 @@ public interface EmployeeMapper {
 
     List<Employee> list(String name);
 
+    @AutoFill(OperationType.INSERT)
     void addEmployee(Employee employee);
 
+    @AutoFill(OperationType.UPDATE)
     void update(Employee employee);
+
+    Employee getById(Long id);
 }
