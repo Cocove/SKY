@@ -43,6 +43,7 @@ public class UserController {
                 .id(user.getId())
                 .openid(user.getOpenid())
                 .token(token)
+
                 .build();
 
         return Result.success(userLoginVO);
