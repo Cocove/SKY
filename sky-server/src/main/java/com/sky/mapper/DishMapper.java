@@ -29,7 +29,7 @@ public interface DishMapper {
 
     Dish getById(Long id);
 
-    void deleteByIds(List<Long> ids);
+    void deleteByIds(List<Long> dishIds);
 
     @AutoFill(value = OperationType.UPDATE)
     void update(Dish dish);

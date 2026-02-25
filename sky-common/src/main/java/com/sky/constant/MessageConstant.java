@@ -25,4 +25,5 @@ public class MessageConstant {
     public static final String ORDER_NOT_FOUND = "订单不存在";
 
     public static final String ALREADY_EXISTS = "用户已存在";
+    public static final String NOT_DELIVER_TO_THIS_ADDRESS = "超出配送范围";
 }

@@ -20,3 +20,6 @@ sky:
   wechat:
     appid: wxc77b02aeeb27e12b
     secret: bdfa0c1392511a99ec6f674b0d3c49d6
+  shop:
+    address: 河北省石家庄市桥西区中山西路108号
+    ak: WYgOwSCni1MCUBw9nFPlYfbDu3OVGhb9
