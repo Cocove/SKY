@@ -26,15 +26,25 @@ public class OrderTask {
 
         List<Orders> ordersList = orderMapper.getByStatusAndTimeLT(Orders.PENDING_PAYMENT, time);
 
-        List<Long> idList = ordersList.stream().map(Orders::getId).collect(Collectors.toList());
-        orderMapper.cancelBatch(
-                Orders.CANCELLED,
-                "订单超时，自动取消",
-                LocalDateTime.now(),
-                idList
-        );
+        if (ordersList != null && !ordersList.isEmpty()) {
 
-        log.info("成功批量取消了 {} 个超时订单", idList.size());
+            // 只有集合不为空，才去提取 ID 并执行批量更新
+            List<Long> orderIds = ordersList.stream()
+                    .map(Orders::getId)
+                    .collect(Collectors.toList());
+
+            orderMapper.cancelBatch(
+                    Orders.CANCELLED,
+                    "订单超时，自动取消",
+                    LocalDateTime.now(),
+                    orderIds
+            );
+
+            log.info("成功批量取消了 {} 个超时订单", orderIds.size());
+        } else {
+            // 如果没有超时订单，直接跳过，打印个日志就行
+            log.info("当前时间没有超时未支付的订单");
+        }
     }
 
 
