@@ -52,7 +52,6 @@ public class OrdersServiceImpl implements OrdersService {
     private DistanceUtil distanceUtil;
 
 
-
     @Override
     public OrdersPaymentVO updatePayMentStatus(OrdersPaymentDTO ordersPaymentDTO) {
 
@@ -60,13 +59,7 @@ public class OrdersServiceImpl implements OrdersService {
         Long UserId = BaseContext.getCurrentId();
         LocalDateTime now = LocalDateTime.now();
 
-        Orders orders = Orders.builder()
-                .userId(UserId)
-                .number(orderNumber)
-                .payStatus(Orders.PAID)
-                .status(Orders.TO_BE_CONFIRMED)
-                .checkoutTime(now)
-                .build();
+        Orders orders = Orders.builder().userId(UserId).number(orderNumber).payStatus(Orders.PAID).status(Orders.TO_BE_CONFIRMED).checkoutTime(now).build();
 
         orderMapper.update(orders);
 
@@ -80,8 +73,6 @@ public class OrdersServiceImpl implements OrdersService {
     public OrderSubmitVO submitOrder(OrdersSubmitDTO ordersSubmitDTO) {
 
 
-
-
         //处理业务异常（地址簿为空、 购物车为空）
         AddressBook addressBook = addressBookMapper.getById(ordersSubmitDTO.getAddressBookId());
         if (addressBook == null) {
@@ -91,7 +82,7 @@ public class OrdersServiceImpl implements OrdersService {
         System.out.println("用户收货地址: " + userAddress);
         try {
             boolean flag = distanceUtil.checkDistance(userAddress);
-            if(!flag){
+            if (!flag) {
                 throw new OrderBusinessException(MessageConstant.NOT_DELIVER_TO_THIS_ADDRESS);
             }
         } catch (Exception e) {
@@ -121,8 +112,6 @@ public class OrdersServiceImpl implements OrdersService {
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         orders.setAddress(addressBook.getProvinceName() + addressBook.getCityName() + addressBook.getDistrictName() + addressBook.getDetail());
-/*        orders.setPackAmount(ordersSubmitDTO.getPackAmount());
-        orders.setEstimatedDeliveryTime(ordersSubmitDTO.getEstimatedDeliveryTime());*/
 
         orderMapper.insert(orders);
 
@@ -143,12 +132,7 @@ public class OrdersServiceImpl implements OrdersService {
         shoppingCartMapper.delete(shoppingCart);
 
         //封装VO返回结果
-        OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder()
-                .id(orders.getId())
-                .orderTime(orders.getOrderTime())
-                .orderNumber(orders.getNumber())
-                .orderAmount(orders.getAmount())
-                .build();
+        OrderSubmitVO orderSubmitVO = OrderSubmitVO.builder().id(orders.getId()).orderTime(orders.getOrderTime()).orderNumber(orders.getNumber()).orderAmount(orders.getAmount()).build();
 
         return orderSubmitVO;
     }
@@ -169,16 +153,13 @@ public class OrdersServiceImpl implements OrdersService {
         }
 
         // ② 拿这一页订单id
-        List<Long> orderIds = ordersList.stream()
-                .map(Orders::getId)
-                .collect(Collectors.toList());
+        List<Long> orderIds = ordersList.stream().map(Orders::getId).collect(Collectors.toList());
 
         // ③ 一次性查出这一页所有订单明细
         List<OrderDetail> detailList = orderDetailMapper.listByOrderIds(orderIds);
 
         // ④ 明细转 VO 后按 orderId 分组：Map<订单id, List<明细VO>>
-        Map<Long, List<OrderDetail>> detailMap = detailList.stream()
-                .collect(Collectors.groupingBy(OrderDetail::getOrderId));
+        Map<Long, List<OrderDetail>> detailMap = detailList.stream().collect(Collectors.groupingBy(OrderDetail::getOrderId));
 
         // ⑤ 组装 OrdersVO
         List<OrdersVO> voList = new ArrayList<>(ordersList.size());
@@ -187,9 +168,7 @@ public class OrdersServiceImpl implements OrdersService {
             BeanUtils.copyProperties(o, vo);
 
             // ✅ 这里不会报错：两边都是 List<OrderDetailVO>
-            vo.setOrderDetailList(
-                    detailMap.getOrDefault(o.getId(), Collections.emptyList())
-            );
+            vo.setOrderDetailList(detailMap.getOrDefault(o.getId(), Collections.emptyList()));
 
             voList.add(vo);
         }
@@ -294,10 +273,7 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
-        Orders orders = Orders.builder()
-                .id(ordersConfirmDTO.getId())
-                .status(Orders.CONFIRMED)
-                .build();
+        Orders orders = Orders.builder().id(ordersConfirmDTO.getId()).status(Orders.CONFIRMED).build();
         orderMapper.update(orders);
     }
 
@@ -305,7 +281,7 @@ public class OrdersServiceImpl implements OrdersService {
     public void admincancel(OrdersCancelDTO ordersCancelDTO) {
         Orders ordersDB = orderMapper.getById(ordersCancelDTO.getId());
 
-        if(ordersDB.getPayStatus() == Orders.PAID){
+        if (ordersDB.getPayStatus() == Orders.PAID) {
             log.info("订单已支付，不能取消");
         }
         Orders orders = new Orders();
@@ -367,7 +343,7 @@ public class OrdersServiceImpl implements OrdersService {
 
         List<Orders> ordersList = page.getResult();
 
-        if(!CollectionUtils.isEmpty(ordersList)){
+        if (!CollectionUtils.isEmpty(ordersList)) {
             for (Orders orders : ordersList) {
                 OrderVO orderVO = new OrderVO();
                 BeanUtils.copyProperties(orders, orderVO);

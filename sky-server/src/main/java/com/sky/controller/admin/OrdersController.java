@@ -10,12 +10,13 @@ import com.sky.service.OrdersService;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrdersVO;
 import io.swagger.models.auth.In;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("adminOrdersController")
 @RequestMapping("/admin/order")
-
+@Slf4j
 public class OrdersController {
 
     @Autowired
@@ -25,6 +26,7 @@ public class OrdersController {
 
     public Result<PageResult> conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
 
+        log.info("查询订单：{}", ordersPageQueryDTO);
         PageResult pageResult = ordersService.conditionSearch(ordersPageQueryDTO);
         return Result.success(pageResult);
     }
